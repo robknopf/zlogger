@@ -1,8 +1,5 @@
 package zlogger
 
-// A wrapper around zerolog
-
-// playing with zerolog
 import (
 	"fmt"
 	"os"
@@ -123,84 +120,38 @@ func (l *ZLogger) Panicf(format string, args ...interface{}) {
 }
 
 func (l *ZLogger) Trace(args ...interface{}) {
-	/*
-		if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-			l.Logger.Debug().Msg(TraceColor + fmt.Sprintf(args[0].(string), args[1:]...) + ResetColor)
-			return
-		}
-	*/
 	l.Logger.Trace().Msg(TraceColor + fmt.Sprint(args...) + ResetColor)
 }
 
 func (l *ZLogger) Debug(args ...interface{}) {
-	/*
-		if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-			l.Logger.Debug().Msg(DebugColor + fmt.Sprintf(args[0].(string), args[1:]...) + ResetColor)
-			return
-		}
-	*/
 	l.Logger.Debug().Msg(DebugColor + fmt.Sprint(args...) + ResetColor)
 }
 
 func (l *ZLogger) Info(args ...interface{}) {
-	/*
-		if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-			l.Logger.Info().Msg(InfoColor + fmt.Sprintf(args[0].(string), args[1:]...) + ResetColor)
-			return
-		}
-	*/
 	l.Logger.Info().Msg(InfoColor + fmt.Sprint(args...) + ResetColor)
 }
 
 func (l *ZLogger) Warn(args ...interface{}) {
-	/*
-		if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-			l.Logger.Warn().Msg(WarnColor + fmt.Sprintf(args[0].(string), args[1:]...) + ResetColor)
-			return
-		}
-	*/
 	l.Logger.Warn().Msg(WarnColor + fmt.Sprint(args...) + ResetColor)
 }
 
 func (l *ZLogger) Error(args ...interface{}) {
-	/*
-		if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-			l.Logger.Error().Msg(ErrorColor + fmt.Sprintf(args[0].(string), args[1:]...) + ResetColor)
-			return
-		}
-	*/
 	l.Logger.Error().Msg(ErrorColor + fmt.Sprint(args...) + ResetColor)
 }
 
 func (l *ZLogger) Fatal(args ...interface{}) {
-	/*
-		if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-			l.Logger.Fatal().Msg(FatalColor + fmt.Sprintf(args[0].(string), args[1:]...) + ResetColor)
-			return
-		}
-	*/
 	l.Logger.Fatal().Msg(FatalColor + fmt.Sprint(args...) + ResetColor)
 }
 
 func (l *ZLogger) Panic(args ...interface{}) {
-	/*
-		if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-			l.Logger.Panic().Msg(PanicColor + fmt.Sprintf(args[0].(string), args[1:]...) + ResetColor)
-			return
-		}
-	*/
 	l.Logger.Panic().Msg(PanicColor + fmt.Sprint(args...) + ResetColor)
 }
 
 func init() {
 	if zlogger == nil {
-
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-
 		output := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: false}
-
 		output.TimeFormat = GreyColor + "[2006-1-2 15:04:05]" + ResetColor
-
 		output.FormatLevel = func(i interface{}) string {
 			var formatLevelColor string = ""
 			switch i.(string) {
@@ -221,7 +172,6 @@ func init() {
 			default:
 				formatLevelColor = DefaultColor
 			}
-
 			return ResetColor + formatLevelColor + strings.ToUpper(fmt.Sprintf("[%s]", i)) + ResetColor
 		}
 		output.FormatMessage = func(i interface{}) string {
@@ -233,179 +183,96 @@ func init() {
 		output.FormatFieldValue = func(i interface{}) string {
 			return ResetColor + fmt.Sprintf("%s)", i)
 		}
-		/*
-			output.FormatTimestamp = func(i interface{}) string {
-				// Note: all layouts should use the standard reference time: Mon Jan 2 15:04:05 MST 2006
-				t, _ := time.Parse("2006-1-2 15:04:05", i.(string))
-				return fmt.Sprintf("[%s%s%s]", BrightCyanColor, t.Format("2006-01-02 15:04:05"), ResetColor)
-			}
-		*/
 
 		zlogger = &ZLogger{}
 		zlogger.Logger = zerolog.New(output).With().Timestamp().Logger()
+
+		ResetDefault(zlogger)
 	}
 
 }
 
-/*
-// playing with logrus
-import (
-	"fmt"
-	"os"
-	"strings"
-
-	"github.com/sirupsen/logrus"
+// expose functions (like export in js) for the static log
+var (
+	Info     = zlogger.Info
+	Infof    = zlogger.Infof
+	Warn     = zlogger.Warn
+	Warnf    = zlogger.Warnf
+	Error    = zlogger.Error
+	Errorf   = zlogger.Errorf
+	Panic    = zlogger.Panic
+	Panicf   = zlogger.Panicf
+	Fatal    = zlogger.Fatal
+	Fatalf   = zlogger.Fatalf
+	Debug    = zlogger.Debug
+	Debugf   = zlogger.Debugf
+	SetLevel = zlogger.SetLevel
 )
 
-const (
-	ResetColor         = "\033[0m"
-	RedColor           = "\033[31m"
-	GreenColor         = "\033[32m"
-	YellowColor        = "\033[33m"
-	BlueColor          = "\033[34m"
-	MagentaColor       = "\033[35m"
-	CyanColor          = "\033[36m"
-	WhiteColor         = "\033[37m"
-	BrightRedColor     = "\033[91m"
-	BrightGreenColor   = "\033[92m"
-	BrightYellowColor  = "\033[93m"
-	BrightBlueColor    = "\033[94m"
-	BrightMagentaColor = "\033[95m"
-	BrightCyanColor    = "\033[96m"
-	BrightWhiteColor   = "\033[97m"
-)
-
-type logWrapper struct {
-	*logrus.Logger
+func ResetDefault(l *ZLogger) {
+	var zLogger = l
+	Info = zLogger.Info
+	Infof = zLogger.Infof
+	Warn = zLogger.Warn
+	Warnf = zLogger.Warnf
+	Error = zLogger.Error
+	Errorf = zLogger.Errorf
+	Panic = zLogger.Panic
+	Panicf = zLogger.Panicf
+	Fatal = zLogger.Fatal
+	Fatalf = zLogger.Fatalf
+	Debug = zLogger.Debug
+	Debugf = zLogger.Debugf
+	SetLevel = zLogger.SetLevel
 }
 
-var logger *logWrapper
-
-func GetLogger() *logWrapper {
-	return logger
-}
-
-func (l *logWrapper) Debug(args ...interface{}) {
-	// rjk
-	if f, ok := args[0].(string); ok {
-		if strings.Contains(f, "%") {
-			l.Logger.Debugf(f, args[1:]...)
-			return
-		}
-	}
-	l.Logger.Debug(args)
-}
-
-func (l *logWrapper) Info(args ...interface{}) {
-	// rjk
-	if (len(args) > 0) && (strings.Contains(args[0].(string), "%")) {
-		l.Logger.Infof(args[0].(string), args[1:]...)
-		return
-	}
-
-	l.Logger.Info(args)
-}
-
-func (l *logWrapper) Warn(args ...interface{}) {
-	// rjk
-	if f, ok := args[0].(string); ok {
-		if strings.Contains(f, "%") {
-			l.Logger.Warnf(f, args[1:]...)
-			return
-		}
-	}
-	l.Logger.Warn(args)
-}
-
-func (l *logWrapper) Error(args ...interface{}) {
-	// rjk
-	if f, ok := args[0].(string); ok {
-		if strings.Contains(f, "%") {
-			l.Logger.Errorf(f, args[1:]...)
-			return
-		}
-	}
-	l.Logger.Error(args)
-}
-
-func (l *logWrapper) Fatal(args ...interface{}) {
-	// rjk
-	if f, ok := args[0].(string); ok {
-		if strings.Contains(f, "%") {
-			l.Logger.Fatalf(f, args[1:]...)
-			return
-		}
-	}
-	l.Logger.Fatal(args)
-}
-
-type customFormatter struct {
-	logrus.TextFormatter
-}
-
-func (f *customFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	// this whole mess of dealing with ansi color codes is required if you want the colored output otherwise you will lose colors in the log levels
-	var levelColor string
-	switch entry.Level {
-	case logrus.DebugLevel, logrus.TraceLevel:
-		levelColor = BrightWhiteColor // white
-	case logrus.WarnLevel:
-		levelColor = YellowColor // yellow
-	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
-		levelColor = BrightRedColor // red
-	case logrus.InfoLevel:
-		levelColor = BrightBlueColor
-	default:
-		levelColor = BrightBlueColor // blue
-	}
-	//return []byte(fmt.Sprintf("[%s] - \x1b[%dm%s\x1b[0m - %s\n", entry.Time.Format(f.TimestampFormat), levelColor, strings.ToUpper(entry.Level.String()), entry.Message)), nil
-	return []byte(fmt.Sprintf("%s[%s] %s%s\n", levelColor, strings.ToUpper(entry.Level.String()), entry.Message, ResetColor)), nil
-}
-
-func init() {
-	if logger == nil {
-		logger = &logWrapper{&logrus.Logger{}}
-	}
-	logger.Out = os.Stdout
-	logger.SetLevel(logrus.DebugLevel)
-	logger.SetFormatter(&customFormatter{
-		logrus.TextFormatter{
-			ForceColors:            true,
-			DisableTimestamp:       true,
-			DisableLevelTruncation: true,
-		},
-	})
-}
-*/
-/////////////////////////////////////////////////////////////////////
-
-// playing with zap logger
+/// zap logger test
 /*
+
 import (
 	"encoding/json"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-// var log = logger.GetLogger()
-var log *zap.SugaredLogger
+type LogLevel = zapcore.Level
+
+type ZLogger struct {
+	l     *zap.SugaredLogger // zap ensure that zap.Logger is safe for concurrent use
+	level LogLevel
+}
+
+type ZLoggerConfig struct {
+	LogLevel `mapstructure:"level"`
+}
+
+var stdlog *ZLogger
+
+func GetLogger() *ZLogger {
+	return stdlog
+}
+
+func (l *ZLogger) SetLevel(ll LogLevel) {
+	stdlog.level = ll
+	//newlogger := l.Logger.Level(zerolog.Level(ll))
+	//l.Logger = newlogger
+}
 
 func init() {
-
 	zapConfig := []byte(`{
 		"level" : "info",
-		"encoding": "json",
+		"encoding": "console",
 		"outputPaths":["stdout"],
 		"errorOutputPaths":["stderr"],
 		"encoderConfig": {
 			"messageKey":"message",
 			"levelKey":"level",
-			"levelEncoder":"capital"
+			"levelEncoder":"capitalColor"
 		}
 	}`)
 
 	var cfg zap.Config
-
 	if err := json.Unmarshal(zapConfig, &cfg); err != nil {
 		panic(err)
 	}
@@ -416,8 +283,95 @@ func init() {
 		panic(err)
 	}
 
-	log = logger.Sugar()
+	stdlog = &ZLogger{
+		l:     logger.Sugar(),
+		level: cfg.Level.Level(),
+	}
+	ResetDefault(stdlog)
+	//log = logger.Sugar()
 
 	defer logger.Sync()
 }
+
+func (l *ZLogger) Debug(args ...interface{}) {
+	l.l.Debug(args...)
+}
+func (l *ZLogger) Info(args ...interface{}) {
+	l.l.Info(args...)
+}
+func (l *ZLogger) Warn(args ...interface{}) {
+	l.l.Warn(args...)
+}
+func (l *ZLogger) Error(args ...interface{}) {
+	l.l.Error(args...)
+}
+func (l *ZLogger) Fatal(args ...interface{}) {
+	l.l.Fatal(args...)
+}
+func (l *ZLogger) DPanic(args ...interface{}) {
+	l.l.DPanic(args...)
+}
+func (l *ZLogger) Panic(args ...interface{}) {
+	l.l.Panic(args...)
+}
+func (l *ZLogger) Debugf(msg string, args ...interface{}) {
+	l.l.Debugf(msg, args...)
+}
+func (l *ZLogger) Infof(msg string, args ...interface{}) {
+	l.l.Infof(msg, args...)
+}
+func (l *ZLogger) Warnf(msg string, args ...interface{}) {
+	l.l.Warnf(msg, args...)
+}
+func (l *ZLogger) Errorf(msg string, args ...interface{}) {
+	l.l.Errorf(msg, args...)
+}
+func (l *ZLogger) Fatalf(msg string, args ...interface{}) {
+	l.l.Fatalf(msg, args...)
+}
+func (l *ZLogger) DPanicf(msg string, args ...interface{}) {
+	l.l.DPanicf(msg, args...)
+}
+func (l *ZLogger) Panicf(msg string, args ...interface{}) {
+	l.l.Panicf(msg, args...)
+}
+
+// expose functions (like export in js) for the static log
+var (
+	Info     = stdlog.Info
+	Infof    = stdlog.Infof
+	Warn     = stdlog.Warn
+	Warnf    = stdlog.Warnf
+	Error    = stdlog.Error
+	Errorf   = stdlog.Errorf
+	DPanic   = stdlog.DPanic
+	DPanicf  = stdlog.DPanicf
+	Panic    = stdlog.Panic
+	Panicf   = stdlog.Panicf
+	Fatal    = stdlog.Fatal
+	Fatalf   = stdlog.Fatalf
+	Debug    = stdlog.Debug
+	Debugf   = stdlog.Debugf
+	SetLevel = stdlog.SetLevel
+)
+
+func ResetDefault(l *ZLogger) {
+	stdlog = l
+	Info = stdlog.Info
+	Infof = stdlog.Infof
+	Warn = stdlog.Warn
+	Warnf = stdlog.Warnf
+	Error = stdlog.Error
+	Errorf = stdlog.Errorf
+	DPanic = stdlog.DPanic
+	DPanicf = stdlog.DPanicf
+	Panic = stdlog.Panic
+	Panicf = stdlog.Panicf
+	Fatal = stdlog.Fatal
+	Fatalf = stdlog.Fatalf
+	Debug = stdlog.Debug
+	Debugf = stdlog.Debugf
+	SetLevel = stdlog.SetLevel
+}
+
 */
