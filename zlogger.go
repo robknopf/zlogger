@@ -103,6 +103,10 @@ func (l *ZLogger) Infof(format string, args ...interface{}) {
 	l.Logger.Info().Msgf(InfoColor+format+ResetColor, args...)
 }
 
+func (l *ZLogger) Printf(format string, args ...interface{}) {
+	l.Logger.Info().Msgf(InfoColor+format+ResetColor, args...)
+}
+
 func (l *ZLogger) Warnf(format string, args ...interface{}) {
 	l.Logger.Warn().Msgf(WarnColor+format+ResetColor, args...)
 }
@@ -128,6 +132,10 @@ func (l *ZLogger) Debug(args ...interface{}) {
 }
 
 func (l *ZLogger) Info(args ...interface{}) {
+	l.Logger.Info().Msg(InfoColor + fmt.Sprint(args...) + ResetColor)
+}
+
+func (l *ZLogger) Print(args ...interface{}) {
 	l.Logger.Info().Msg(InfoColor + fmt.Sprint(args...) + ResetColor)
 }
 
@@ -196,6 +204,8 @@ func init() {
 var (
 	Info     = zlogger.Info
 	Infof    = zlogger.Infof
+	Print     = zlogger.Print
+	Printf    = zlogger.Printf
 	Warn     = zlogger.Warn
 	Warnf    = zlogger.Warnf
 	Error    = zlogger.Error
@@ -213,6 +223,8 @@ func ResetDefault(l *ZLogger) {
 	var zLogger = l
 	Info = zLogger.Info
 	Infof = zLogger.Infof
+	Print = zLogger.Print
+	Printf = zLogger.Printf
 	Warn = zLogger.Warn
 	Warnf = zLogger.Warnf
 	Error = zLogger.Error
