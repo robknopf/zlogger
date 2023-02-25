@@ -85,6 +85,10 @@ func (l *ZLogger) SetLevel(ll LogLevel) {
 	l.Logger = newlogger
 }
 
+// NoOp
+func (l *ZLogger) SetFlags(flag int) {
+}
+
 func (l *ZLogger) NewLogger(ll LogLevel) *ZLogger {
 	newlogger := l.Logger.Level(zerolog.Level(ll))
 
@@ -100,10 +104,6 @@ func (l *ZLogger) Debugf(format string, args ...interface{}) {
 }
 
 func (l *ZLogger) Infof(format string, args ...interface{}) {
-	l.Logger.Info().Msgf(InfoColor+format+ResetColor, args...)
-}
-
-func (l *ZLogger) Printf(format string, args ...interface{}) {
 	l.Logger.Info().Msgf(InfoColor+format+ResetColor, args...)
 }
 
@@ -132,10 +132,6 @@ func (l *ZLogger) Debug(args ...interface{}) {
 }
 
 func (l *ZLogger) Info(args ...interface{}) {
-	l.Logger.Info().Msg(InfoColor + fmt.Sprint(args...) + ResetColor)
-}
-
-func (l *ZLogger) Print(args ...interface{}) {
 	l.Logger.Info().Msg(InfoColor + fmt.Sprint(args...) + ResetColor)
 }
 
@@ -202,29 +198,31 @@ func init() {
 
 // expose functions (like export in js) for the static log
 var (
-	Info     = zlogger.Info
-	Infof    = zlogger.Infof
-	Print     = zlogger.Print
-	Printf    = zlogger.Printf
-	Warn     = zlogger.Warn
-	Warnf    = zlogger.Warnf
-	Error    = zlogger.Error
-	Errorf   = zlogger.Errorf
-	Panic    = zlogger.Panic
-	Panicf   = zlogger.Panicf
-	Fatal    = zlogger.Fatal
-	Fatalf   = zlogger.Fatalf
-	Debug    = zlogger.Debug
-	Debugf   = zlogger.Debugf
+	Info   = zlogger.Info
+	Infof  = zlogger.Infof
+	Warn   = zlogger.Warn
+	Warnf  = zlogger.Warnf
+	Error  = zlogger.Error
+	Errorf = zlogger.Errorf
+	Panic  = zlogger.Panic
+	Panicf = zlogger.Panicf
+	Fatal  = zlogger.Fatal
+	Fatalf = zlogger.Fatalf
+	Debug  = zlogger.Debug
+	Debugf = zlogger.Debugf
+
+	// standard log compatibility
+	Print    = zlogger.Info
+	Printf   = zlogger.Infof
+	Println  = zlogger.Info
 	SetLevel = zlogger.SetLevel
+	SetFlags = zlogger.SetFlags
 )
 
 func ResetDefault(l *ZLogger) {
 	var zLogger = l
 	Info = zLogger.Info
 	Infof = zLogger.Infof
-	Print = zLogger.Print
-	Printf = zLogger.Printf
 	Warn = zLogger.Warn
 	Warnf = zLogger.Warnf
 	Error = zLogger.Error
@@ -235,7 +233,13 @@ func ResetDefault(l *ZLogger) {
 	Fatalf = zLogger.Fatalf
 	Debug = zLogger.Debug
 	Debugf = zLogger.Debugf
+
+	// standard log compatibility
+	Print = zLogger.Info
+	Printf = zLogger.Infof
+	Println = zLogger.Info
 	SetLevel = zLogger.SetLevel
+	SetFlags = zLogger.SetFlags
 }
 
 /// zap logger test
