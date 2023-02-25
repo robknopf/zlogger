@@ -210,6 +210,8 @@ var (
 	Fatalf = zlogger.Fatalf
 	Debug  = zlogger.Debug
 	Debugf = zlogger.Debugf
+	Trace  = zlogger.Trace
+	Tracef = zlogger.Tracef
 
 	// standard log compatibility
 	Print    = zlogger.Info
@@ -233,6 +235,8 @@ func ResetDefault(l *ZLogger) {
 	Fatalf = zLogger.Fatalf
 	Debug = zLogger.Debug
 	Debugf = zLogger.Debugf
+	Trace = zLogger.Trace
+	Tracef = zLogger.Tracef
 
 	// standard log compatibility
 	Print = zLogger.Info
